@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="fr" id="page-root">
+<head>
+  <meta charset="UTF-8" />
+  <!--
+    Security: CSP via meta tag.
+    NOTE: meta CSP is NOT enforced when the file is opened locally via file://
+    For production, move this to an HTTP response header.
+    'unsafe-inline' is required because all JS/CSS is inline in this single-file deliverable.
+  -->
+  <meta http-equiv="Content-Security-Policy"
+    content="
+      default-src 'self';
+      script-src 'self' https://cdnjs.cloudflare.com https://cdn.tailwindcss.com 'unsafe-inline';
+      style-src 'self' https://fonts.googleapis.com https://cdn.tailwindcss.com 'unsafe-inline';
+      font-src https://fonts.gstatic.com data:;
+      img-src 'self' data:;
+    "
+  />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta name="referrer" content="no-referrer" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Armand HURAULT — Consultant Cybersécurité</title>
+  <meta name="description" content="Armand HURAULT — Consultant cybersécurité freelance, 6 ans d'expérience internationale. EBIOS RM, DevSecOps, IA agentique. Disponible en France &amp; international." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Orbitron', 'monospace'],
+            body:    ['DM Mono', 'monospace'],
+          },
+        }
+      }
+    }
+  </script>
+
+  <!--
+    Three.js r128 from cdnjs.
+    SRI intentionally omitted for local file usage.
+    Re-add integrity/crossorigin attributes when serving over HTTPS.
+  -->
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
+    onerror="console.error('Three.js failed to load — check your internet connection or CSP.')">
+  </script>
+
+  <style>
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+    /* Scanline overlay — purely decorative */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background: repeating-linear-gradient(
+        0deg, transparent, transparent 2px,
+        rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px
+      );
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #050811; }
+    ::-webkit-scrollbar-thumb { background: rgba(0,210,255,0.3); border-radius: 3px; }
+
+    /* Decorative line before section labels */
+    .section-label::before {
+      content: '';
+      display: inline-block;
+      width: 32px; height: 1px;
+      background: #00d2ff;
+    }
+
+    /* Scroll hint vertical line */
+    .scroll-hint::after {
+      content: '';
+      width: 1px; height: 40px;
+      background: linear-gradient(to bottom, #2a3a50, transparent);
+    }
+
+    /* Service card top accent bar — uses --accent-color set inline per card */
+    .service-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent-color, #00d2ff), transparent);
+      opacity: 0;
+      transition: opacity 0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+    .service-card:hover::before { opacity: 1; }
+
+    /* Team card decorative glow circle */
+    .team-card::after {
+      content: '';
+      position: absolute; bottom: -60px; right: -60px;
+      width: 120px; height: 120px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,210,255,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* Gradient text for hero highlight */
+    .hero-title .highlight {
+      background: linear-gradient(90deg, #00d2ff 0%, #ff2d78 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* strong inside about text (also applies after language swap via innerHTML) */
+    .about-text strong { color: #e8edf5; font-weight: 500; }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes bounce-scroll {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50%       { transform: translateX(-50%) translateY(6px); }
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    .hero-content { animation: fadeInUp 1.2s ease both; }
+    .scroll-hint  { animation: bounce-scroll 2s ease infinite; }
+    .cursor {
+      display: inline-block; width: 8px; height: 14px;
+      background: #00d2ff; vertical-align: middle;
+      animation: blink 1.1s step-end infinite;
+    }
+
+    /* Scroll reveal */
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* Mobile menu visibility */
+    .mobile-menu { display: none; }
+    .mobile-menu.open { display: flex; }
+
+    @media (max-width: 640px) {
+      .nav-links  { display: none; }
+      .nav-toggle { display: flex !important; }
+      .about-stats { flex-wrap: wrap; gap: 1.2rem; }
+      footer { flex-direction: column; gap: 0.5rem; text-align: center; }
+    }
+  </style>
+</head>
+<body class="bg-[#050811] text-[#e8edf5] font-body text-[15px] leading-[1.7] overflow-x-hidden">
+
+  <!-- =============================================
+       NAVIGATION
+  ============================================= -->
+  <nav role="navigation" aria-label="Navigation principale"
+    class="fixed top-0 left-0 right-0 z-[1000] flex items-center justify-between px-[clamp(1.5rem,4vw,3rem)] h-16 bg-[rgba(5,8,17,0.85)] backdrop-blur-[16px] border-b border-[rgba(0,210,255,0.15)]">
+
+    <div class="font-display text-base font-black tracking-[0.1em] text-[#e8edf5]">
+      ARMAND<span class="text-[#00d2ff]">.</span>HURAULT
+    </div>
+
+    <ul class="nav-links flex gap-8 list-none">
+      <li><a href="#about" data-fr="À propos" data-en="About"
+        class="font-display text-[0.65rem] font-bold tracking-[0.15em] text-[#5a7090] uppercase no-underline transition-colors duration-300 hover:text-[#00d2ff]">À propos</a></li>
+      <li><a href="#services" data-fr="Services" data-en="Services"
+        class="font-display text-[0.65rem] font-bold tracking-[0.15em] text-[#5a7090] uppercase no-underline transition-colors duration-300 hover:text-[#00d2ff]">Services</a></li>
+      <li><a href="#contact" data-fr="Contact" data-en="Contact"
+        class="font-display text-[0.65rem] font-bold tracking-[0.15em] text-[#5a7090] uppercase no-underline transition-colors duration-300 hover:text-[#00d2ff]">Contact</a></li>
+    </ul>
+
+    <button
+      class="flex items-center justify-center w-9 h-7 bg-transparent border border-[rgba(0,210,255,0.15)] rounded font-display text-[0.6rem] font-bold tracking-[0.12em] cursor-pointer mr-3 text-[#5a7090] transition-all duration-300 hover:border-[#00d2ff] hover:text-[#00d2ff] hover:shadow-[0_0_10px_rgba(0,210,255,0.15)]"
+      id="langToggle" aria-label="Switch language / Changer de langue">
+      <span id="langLabel">EN</span>
+    </button>
+
+    <button class="nav-toggle hidden flex-col gap-[5px] bg-transparent border-none cursor-pointer p-1"
+      aria-label="Ouvrir le menu" aria-expanded="false" id="navToggle">
+      <span class="block w-[22px] h-[2px] bg-[#e8edf5] transition-all duration-300"></span>
+      <span class="block w-[22px] h-[2px] bg-[#e8edf5] transition-all duration-300"></span>
+      <span class="block w-[22px] h-[2px] bg-[#e8edf5] transition-all duration-300"></span>
+    </button>
+  </nav>
+
+  <!-- Mobile menu -->
+  <div class="mobile-menu fixed inset-x-0 bottom-0 top-16 bg-[rgba(5,8,17,0.97)] z-[999] flex-col items-center justify-center gap-8"
+    id="mobileMenu" role="dialog" aria-modal="true" aria-label="Menu mobile">
+    <a href="#about" onclick="closeMobileMenu()" data-fr="À propos" data-en="About"
+      class="font-display text-base font-bold tracking-[0.15em] text-[#5a7090] uppercase no-underline hover:text-[#00d2ff]">À propos</a>
+    <a href="#services" onclick="closeMobileMenu()" data-fr="Services" data-en="Services"
+      class="font-display text-base font-bold tracking-[0.15em] text-[#5a7090] uppercase no-underline hover:text-[#00d2ff]">Services</a>
+    <a href="#contact" onclick="closeMobileMenu()" data-fr="Contact" data-en="Contact"
+      class="font-display text-base font-bold tracking-[0.15em] text-[#5a7090] uppercase no-underline hover:text-[#00d2ff]">Contact</a>
+  </div>
+
+  <!-- =============================================
+       HERO
+  ============================================= -->
+  <section id="hero" aria-label="Introduction"
+    class="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden">
+
+    <canvas id="hero-canvas" aria-hidden="true" class="absolute inset-0 w-full h-full"></canvas>
+
+    <div class="hero-content relative z-[2] text-center px-6">
+      <p class="font-display text-[0.6rem] font-bold tracking-[0.35em] text-[#00d2ff] uppercase mb-6"
+        data-fr="// Consultant Cybersécurité Freelance" data-en="// Freelance Cybersecurity Consultant">// Consultant Cybersécurité Freelance</p>
+      <h1 class="hero-title font-display text-[clamp(2.4rem,7vw,5.5rem)] font-black leading-[1.05] tracking-[-0.01em] text-[#e8edf5] mb-4">
+        ARMAND<br/>
+        <span class="highlight">HURAULT</span>
+      </h1>
+      <p class="text-[0.85rem] text-[#5a7090] tracking-[0.2em] uppercase mb-10"
+        data-fr="Cybersécurité · DevSecOps · IA Agentique" data-en="Cybersecurity · DevSecOps · Agentic AI">Cybersécurité · DevSecOps · IA Agentique</p>
+      <a class="inline-flex items-center gap-[0.6rem] px-8 py-[0.8rem] font-display text-[0.65rem] font-bold tracking-[0.2em] uppercase text-[#050811] bg-[#00d2ff] rounded no-underline cursor-pointer transition-all duration-300 hover:bg-[#33dbff] hover:shadow-[0_0_32px_rgba(0,210,255,0.45)]"
+        href="#services" data-fr="Découvrir mes services" data-en="Explore my services">
+        Découvrir mes services
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <path d="M1 7h12M8 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </div>
+
+    <div class="scroll-hint absolute bottom-8 left-1/2 flex flex-col items-center gap-[0.4rem] font-display text-[0.55rem] tracking-[0.2em] text-[#2a3a50] uppercase z-[2]"
+      aria-hidden="true" data-fr="Scroll" data-en="Scroll">Scroll</div>
+  </section>
+
+  <!-- =============================================
+       ABOUT
+  ============================================= -->
+  <section id="about" aria-labelledby="about-title"
+    class="bg-[#080e1a] border-t border-b border-[rgba(0,210,255,0.15)] py-[clamp(4rem,8vw,7rem)] px-[clamp(1.5rem,6vw,5rem)]">
+
+    <div class="grid grid-cols-2 max-[900px]:grid-cols-1 gap-16 max-[900px]:gap-10 items-center max-w-[1100px] mx-auto">
+
+      <div class="about-text reveal">
+        <div class="mb-14">
+          <p class="section-label font-display text-[0.6rem] font-bold tracking-[0.35em] text-[#00d2ff] uppercase flex items-center gap-3 mb-4"
+            data-fr="À propos" data-en="About us">À propos</p>
+          <h2 class="font-display text-[clamp(1.6rem,3.5vw,2.6rem)] font-black tracking-[-0.02em] text-[#e8edf5] leading-[1.1]"
+            id="about-title"
+            data-fr="6 ans d'expérience,<br/>3 pays"
+            data-en="6 years of experience,<br/>3 countries">6 ans d'expérience,<br/>3 pays</h2>
+        </div>
+        <p class="text-[#5a7090] mb-5 text-[0.95rem]"
+          data-fr="<strong>Consultant cybersécurité</strong> avec 6 ans d'expérience en environnements internationaux (France, Suisse, États-Unis), spécialisé en gestion de la sécurité des SI, gouvernance sécurité et analyse de risques <strong>EBIOS RM</strong>."
+          data-en="<strong>Cybersecurity consultant</strong> with 6 years of experience across international environments (France, Switzerland, United States), specialising in information security management, security governance and <strong>EBIOS RM</strong> risk analysis.">
+          <strong>Consultant cybersécurité</strong> avec 6 ans d'expérience en environnements internationaux
+          (France, Suisse, États-Unis), spécialisé en gestion de la sécurité des SI, gouvernance sécurité
+          et analyse de risques <strong>EBIOS RM</strong>.
+        </p>
+        <p class="text-[#5a7090] mb-5 text-[0.95rem]"
+          data-fr="J'interviens sur la mise en place de stacks <strong>DevSecOps</strong>, le déploiement de SIEM, et le développement de solutions d'<strong>IA agentique</strong> pour la surveillance et la gestion des incidents."
+          data-en="I build <strong>DevSecOps</strong> stacks, deploy SIEM solutions, and develop <strong>agentic AI</strong> pipelines for monitoring and incident management.">
+          J'interviens sur la mise en place de stacks <strong>DevSecOps</strong>, le déploiement de SIEM,
+          et le développement de solutions d'<strong>IA agentique</strong> pour la surveillance et la gestion des incidents.
+        </p>
+        <p class="text-[#5a7090] mb-5 text-[0.95rem]"
+          data-fr="Mon approche : comprendre vos enjeux métier et réglementaires avant de proposer une solution adaptée."
+          data-en="My approach: understand your business and regulatory challenges before proposing a tailored solution.">
+          Mon approche : comprendre vos enjeux métier et réglementaires avant de proposer une solution adaptée.
+        </p>
+
+        <div class="about-stats flex gap-8 mt-10 pt-8 border-t border-[rgba(0,210,255,0.15)]">
+          <div class="flex flex-col">
+            <span class="font-display text-[1.8rem] font-black text-[#00d2ff] leading-none">6</span>
+            <span class="text-[0.7rem] tracking-[0.1em] text-[#5a7090] uppercase mt-1"
+              data-fr="Ans d'expérience" data-en="Years of experience">Ans d'expérience</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="font-display text-[1.8rem] font-black text-[#00d2ff] leading-none">10+</span>
+            <span class="text-[0.7rem] tracking-[0.1em] text-[#5a7090] uppercase mt-1"
+              data-fr="Projets livrés" data-en="Projects delivered">Projets livrés</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="font-display text-[1.8rem] font-black text-[#00d2ff] leading-none">6</span>
+            <span class="text-[0.7rem] tracking-[0.1em] text-[#5a7090] uppercase mt-1"
+              data-fr="Domaines maîtrisés" data-en="Areas of expertise">Domaines maîtrisés</span>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-[0.4rem] mt-6">
+          <span class="font-display text-[0.55rem] font-bold tracking-[0.12em] uppercase px-[0.65rem] py-[0.25rem] rounded-[2px] bg-[rgba(0,210,255,0.07)] border border-[rgba(0,210,255,0.2)] text-[#00d2ff]">EBIOS RM</span>
+          <span class="font-display text-[0.55rem] font-bold tracking-[0.12em] uppercase px-[0.65rem] py-[0.25rem] rounded-[2px] bg-[rgba(0,210,255,0.07)] border border-[rgba(0,210,255,0.2)] text-[#00d2ff]">DevSecOps</span>
+          <span class="font-display text-[0.55rem] font-bold tracking-[0.12em] uppercase px-[0.65rem] py-[0.25rem] rounded-[2px] bg-[rgba(0,210,255,0.07)] border border-[rgba(0,210,255,0.2)] text-[#00d2ff]">IA Agentique</span>
+        </div>
+      </div>
+
+      <!-- Decorative terminal — purely visual, no user input -->
+      <div class="reveal bg-[#0b1220] border border-[rgba(0,210,255,0.15)] rounded overflow-hidden text-[0.8rem]"
+        aria-hidden="true">
+        <div class="flex items-center gap-2 px-4 py-[0.65rem] bg-[rgba(0,0,0,0.3)] border-b border-[rgba(0,210,255,0.15)]">
+          <span class="w-[10px] h-[10px] rounded-full bg-[#ff5f56]"></span>
+          <span class="w-[10px] h-[10px] rounded-full bg-[#ffbd2e]"></span>
+          <span class="w-[10px] h-[10px] rounded-full bg-[#27c93f]"></span>
+        </div>
+        <div class="px-[1.4rem] py-[1.2rem] leading-[1.9] text-[#5a7090]">
+          <span class="text-[#2a3a50]" data-fr="# armand-hurault — profil" data-en="# armand-hurault — profile"># armand-hurault — profil</span><br/>
+          <br/>
+          <span class="text-[#00ff8c]">const</span> profile = {<br/>
+          &nbsp;&nbsp;name: <span class="text-[#ff2d78]">"Armand HURAULT"</span>,<br/>
+          &nbsp;&nbsp;role: <span class="text-[#ff2d78]">"Consultant Cybersécurité"</span>,<br/>
+          &nbsp;&nbsp;location: <span class="text-[#ff2d78]">"Paris, France"</span>,<br/>
+          &nbsp;&nbsp;experience: <span class="text-[#ff2d78]">"6 ans"</span>,<br/>
+          &nbsp;&nbsp;expertise: [<br/>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-[#ff2d78]">"Cybersécurité / EBIOS RM"</span>,<br/>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-[#ff2d78]">"DevSecOps / Cloud"</span>,<br/>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-[#ff2d78]">"IA Agentique / LLM"</span>,<br/>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-[#ff2d78]">"ITSM / Gouvernance IT"</span>,<br/>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-[#ff2d78]">"Automatisation (n8n, Python)"</span><br/>
+          &nbsp;&nbsp;],<br/>
+          &nbsp;&nbsp;available: <span class="text-[#00d2ff]">true</span><br/>
+          };<br/>
+          <br/>
+          <span class="text-[#2a3a50]" data-fr="// Disponible pour votre prochain projet" data-en="// Available for your next project">// Disponible pour votre prochain projet</span><br/>
+          <span class="cursor"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================================
+       SERVICES
+  ============================================= -->
+  <section id="services" aria-labelledby="services-title"
+    class="py-[clamp(4rem,8vw,7rem)] px-[clamp(1.5rem,6vw,5rem)] max-w-[1200px] mx-auto">
+
+    <div class="mb-14 reveal">
+      <p class="section-label font-display text-[0.6rem] font-bold tracking-[0.35em] text-[#00d2ff] uppercase flex items-center gap-3 mb-4"
+        data-fr="Mes services" data-en="My services">Mes services</p>
+      <h2 class="font-display text-[clamp(1.6rem,3.5vw,2.6rem)] font-black tracking-[-0.02em] text-[#e8edf5] leading-[1.1]"
+        id="services-title" data-fr="Ce que je fais" data-en="What I do">Ce que je fais</h2>
+    </div>
+
+    <div class="grid grid-cols-3 max-[900px]:grid-cols-1 gap-6">
+
+      <!-- Service 1: Gouvernance & Conformité -->
+      <article class="service-card relative bg-[#0b1220] border border-[rgba(0,210,255,0.15)] rounded py-[2.2rem] px-[1.8rem] overflow-hidden transition-all duration-300 hover:border-[rgba(0,210,255,0.5)] hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(0,0,0,0.4)] reveal"
+        style="--accent-color:#00d2ff;">
+        <div class="w-[52px] h-[52px] rounded flex items-center justify-center mb-6 text-[1.4rem] bg-[rgba(0,210,255,0.08)] border border-[rgba(0,210,255,0.15)]" aria-hidden="true">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#00d2ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/>
+          </svg>
+        </div>
+        <h3 class="font-display text-[0.8rem] font-bold tracking-[0.08em] text-[#e8edf5] mb-3 uppercase"
+          data-fr="Gouvernance &amp; Conformité" data-en="Governance &amp; Compliance">Gouvernance &amp; Conformité</h3>
+        <p class="text-[0.85rem] text-[#5a7090] leading-[1.7] mb-6"
+          data-fr="Analyse de risques EBIOS RM, mise en conformité RGPD, NIS2, DORA et ISO 27001, élaboration de politiques de sécurité et accompagnement à la transformation cyber."
+          data-en="EBIOS RM risk analysis, RGPD, NIS2, DORA and ISO 27001 compliance, security policy development and cyber transformation roadmap.">
+          Analyse de risques EBIOS RM, mise en conformité RGPD, NIS2, DORA et ISO 27001,
+          élaboration de politiques de sécurité et accompagnement à la transformation cyber.
+        </p>
+        <div class="flex flex-wrap gap-[0.4rem]">
+          <span class="font-display text-[0.55rem] font-bold tracking-[0.12em] uppercase px-[0.65rem] py-[0.25rem] rounded-[2px] bg-[rgba(0,210,255,0.07)] border border-[rgba(0,210,255,0.2)] text-[#00d2ff]">EBIOS RM</span>
+          <span class="font-display text-[0.55rem] font-bold tracking-[0.12em] uppercase px-[0.65rem] py-[0.25rem] rounded-[2px] bg-[rgba(0,210,255,0.07)] border border-[rgba(0,210,255,0.2)] text-[#00d2ff]">ISO 27001</span>
+          <span class="font-display text-[0.55rem] font-bold tracking-[0.12em] uppercase px-[0.65rem] py-[0.25rem] rounded-[2px] bg-[rgba(0,210,255,0.07)] border border-[rgba(0,210,255,0.2)] text-[#00d2ff]">RGPD</span>
+          <span class="font-display text-[0.55rem] font-bold tracking-[0.12em] uppercase px-[0.65rem] py-[0.25rem] rounded-[2px] bg-[rgba(0,210,255,0.07)] border border-[rgba(0,210,255,0.2)] text-[#00d2ff]">NIS2</span>
+          <span class="font-display text-[0.55rem] font-bold tracking-[0.12em] uppercase px-[0.65rem] py-[0.25rem] rounded-[2px] bg-[rgba(0,210,255,0.07)] border border-[rgba(0,210,255,0.2)] text-[#00d2ff]">DORA</span>
+        </div>
+      </article>
+
+      <!-- Service 2: Cybersécurité -->
+      <article class="service-card relative bg-[#0b1220] border border-[rgba(0,210,255,0.15)] rounded py-[2.2rem] px-[1.8rem] overflow-hidden transition-all duration-300 hover:border-[rgba(0,210,255,0.5)] hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(0,0,0,0.4)] reveal"
+        style="--accent-color:#ff2d78;">
+        <div class="w-[52px] h-[52px] rounded flex items-center justify-center mb-6 bg-[rgba(255,45,120,0.08)] border border-[rgba(255,45,120,0.2)]" aria-hidden="true">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ff2d78" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <h3 class="font-display text-[0.8rem] font-bold tracking-[0.08em] text-[#e8edf5] mb-3 uppercase"
+          data-fr="Cybersécurité" data-en="Cybersecurity">Cybersécurité</h3>
+        <p class="text-[0.85rem] text-[#5a7090] leading-[1.7] mb-6"
+          data-fr="Audits OWASP Top 10, tests d'intrusion (Burp Suite, OWASP ZAP), déploiement SIEM (ELK, Splunk), détection de menaces en temps réel et campagnes de sensibilisation (phishing, OSINT)."
+          data-en="OWASP Top 10 audits, penetration testing (Burp Suite, OWASP ZAP), SIEM deployment (ELK, Splunk), real-time threat detection and awareness campaigns (phishing, OSINT).">
+          Audits OWASP Top 10, tests d'intrusion (Burp Suite, OWASP ZAP), déploiement SIEM
+          (ELK, Splunk), détection de menaces en temps réel et campagnes de sensibilisation (phishing, OSINT).
+        </p>
+        <div class="flex flex-wrap gap-[0.4rem]">
+          <span class="font-display text-[0.55rem] font-bold tracking-[0.12em] uppercase px-[0.65rem] py-[0.25rem] rounded-[2px] bg-[rgba(255,45,120,0.07)] border border-[rgba(255,45,120,0.3)] text-[#ff2d78]">Pentest</span>
+          <span class="font-display text-[0.55rem] font-bold tracking-[0.12em] uppercase px-[0.65rem] py-[0.25rem] rounded-[2px] bg-[rgba(255,45,120,0.07)] border border-[rgba(255,45,120,0.3)] text-[#ff2d78]">OWASP</span>
+          <span class="font-display text-[0.55rem] font-bold tracking-[0.12em] uppercase px-[0.65rem] py-[0.25rem] rounded-[2px] bg-[rgba(255,45,120,0.07)] border border-[rgba(255,45,120,0.3)] text-[#ff2d78]">Burp Suite</span>
+          <span class="font-display text-[0.55rem] font-bold tracking-[0.12em] uppercase px-[0.65rem] py-[0.25rem] rounded-[2px] bg-[rgba(255,45,120,0.07)] border border-[rgba(255,45,120,0.3)] text-[#ff2d78]">SIEM / ELK</span>
+          <span class="font-display text-[0.55rem] font-bold tracking-[0.12em] uppercase px-[0.65rem] py-[0.25rem] rounded-[2px] bg-[rgba(255,45,120,0.07)] border border-[rgba(255,45,120,0.3)] text-[#ff2d78]">Wazuh</span>
+        </div>
+      </article>
+
+      <!-- Service 3: DevOps / Cloud -->
+      <article class="service-card relative bg-[#0b1220] border border-[rgba(0,210,255,0.15)] rounded py-[2.2rem] px-[1.8rem] overflow-hidden transition-all duration-300 hover:border-[rgba(0,210,255,0.5)] hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(0,0,0,0.4)] reveal"
+        style="--accent-color:#00ff8c;">
+        <div class="w-[52px] h-[52px] rounded flex items-center justify-center mb-6 bg-[rgba(0,255,140,0.06)] border border-[rgba(0,255,140,0.2)]" aria-hidden="true">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#00ff8c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>
+            <path d="M6 8h.01M10 8l4 3-4 3"/>
+          </svg>
+        </div>
+        <h3 class="font-display text-[0.8rem] font-bold tracking-[0.08em] text-[#e8edf5] mb-3 uppercase"
+          data-fr="DevSecOps &amp; Infrastructure" data-en="DevSecOps &amp; Infrastructure">DevSecOps &amp; Infrastructure</h3>
+        <p class="text-[0.85rem] text-[#5a7090] leading-[1.7] mb-6"
+          data-fr="Déploiement et sécurisation d'infrastructures Docker/Portainer, Infrastructure as Code (Terraform, Ansible), CI/CD Jenkins, monitoring Grafana/Prometheus et gestion des accès IAM."
+          data-en="Docker/Portainer infrastructure deployment and hardening, Infrastructure as Code (Terraform, Ansible), Jenkins CI/CD, Grafana/Prometheus monitoring and IAM access management.">
+          Déploiement et sécurisation d'infrastructures Docker/Portainer, Infrastructure as Code
+          (Terraform, Ansible), CI/CD Jenkins, monitoring Grafana/Prometheus et gestion des accès IAM.
+        </p>
+        <div class="flex flex-wrap gap-[0.4rem]">
+          <span class="font-display text-[0.55rem] font-bold tracking-[0.12em] uppercase px-[0.65rem] py-[0.25rem] rounded-[2px] bg-[rgba(0,255,140,0.06)] border border-[rgba(0,255,140,0.3)] text-[#00ff8c]">Docker</span>
+          <span class="font-display text-[0.55rem] font-bold tracking-[0.12em] uppercase px-[0.65rem] py-[0.25rem] rounded-[2px] bg-[rgba(0,255,140,0.06)] border border-[rgba(0,255,140,0.3)] text-[#00ff8c]">Terraform</span>
+          <span class="font-display text-[0.55rem] font-bold tracking-[0.12em] uppercase px-[0.65rem] py-[0.25rem] rounded-[2px] bg-[rgba(0,255,140,0.06)] border border-[rgba(0,255,140,0.3)] text-[#00ff8c]">Ansible</span>
+          <span class="font-display text-[0.55rem] font-bold tracking-[0.12em] uppercase px-[0.65rem] py-[0.25rem] rounded-[2px] bg-[rgba(0,255,140,0.06)] border border-[rgba(0,255,140,0.3)] text-[#00ff8c]">Jenkins</span>
+          <span class="font-display text-[0.55rem] font-bold tracking-[0.12em] uppercase px-[0.65rem] py-[0.25rem] rounded-[2px] bg-[rgba(0,255,140,0.06)] border border-[rgba(0,255,140,0.3)] text-[#00ff8c]">AWS</span>
+        </div>
+      </article>
+
+      <!-- Service 4: Gestion de crise & Résilience -->
+      <article class="service-card relative bg-[#0b1220] border border-[rgba(0,210,255,0.15)] rounded py-[2.2rem] px-[1.8rem] overflow-hidden transition-all duration-300 hover:border-[rgba(0,210,255,0.5)] hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(0,0,0,0.4)] reveal"
+        style="--accent-color:#a78bfa;">
+        <div class="w-[52px] h-[52px] rounded flex items-center justify-center mb-6 bg-[rgba(167,139,250,0.07)] border border-[rgba(167,139,250,0.2)]" aria-hidden="true">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+        </div>
+        <h3 class="font-display text-[0.8rem] font-bold tracking-[0.08em] text-[#e8edf5] mb-3 uppercase"
+          data-fr="Gestion de crise &amp; Résilience" data-en="Crisis Management &amp; Resilience">Gestion de crise &amp; Résilience</h3>
+        <p class="text-[0.85rem] text-[#5a7090] leading-[1.7] mb-6"
+          data-fr="Coordination de crises cyber, plans de reprise d'activité (PRA/PCA), restauration de services critiques, gestion des incidents majeurs et remédiation automatisée des menaces récurrentes."
+          data-en="Cyber crisis coordination, business continuity plans (BCP/DRP), critical service restoration, major incident management and automated remediation of recurring threats.">
+          Coordination de crises cyber, plans de reprise d'activité (PRA/PCA), restauration de
+          services critiques, gestion des incidents majeurs et remédiation automatisée des menaces récurrentes.
+        </p>
+        <div class="flex flex-wrap gap-[0.4rem]">
+          <span class="font-display text-[0.55rem] font-bold tracking-[0.12em] uppercase px-[0.65rem] py-[0.25rem] rounded-[2px] bg-[rgba(167,139,250,0.07)] border border-[rgba(167,139,250,0.3)] text-[#a78bfa]">PRA / PCA</span>
+          <span class="font-display text-[0.55rem] font-bold tracking-[0.12em] uppercase px-[0.65rem] py-[0.25rem] rounded-[2px] bg-[rgba(167,139,250,0.07)] border border-[rgba(167,139,250,0.3)] text-[#a78bfa]">Incident Mgmt</span>
+          <span class="font-display text-[0.55rem] font-bold tracking-[0.12em] uppercase px-[0.65rem] py-[0.25rem] rounded-[2px] bg-[rgba(167,139,250,0.07)] border border-[rgba(167,139,250,0.3)] text-[#a78bfa]">OpenVAS</span>
+          <span class="font-display text-[0.55rem] font-bold tracking-[0.12em] uppercase px-[0.65rem] py-[0.25rem] rounded-[2px] bg-[rgba(167,139,250,0.07)] border border-[rgba(167,139,250,0.3)] text-[#a78bfa]">Wazuh</span>
+          <span class="font-display text-[0.55rem] font-bold tracking-[0.12em] uppercase px-[0.65rem] py-[0.25rem] rounded-[2px] bg-[rgba(167,139,250,0.07)] border border-[rgba(167,139,250,0.3)] text-[#a78bfa]">ITIL</span>
+        </div>
+      </article>
+
+      <!-- Service 5: Automation & AI -->
+      <article class="service-card relative bg-[#0b1220] border border-[rgba(0,210,255,0.15)] rounded py-[2.2rem] px-[1.8rem] overflow-hidden transition-all duration-300 hover:border-[rgba(0,210,255,0.5)] hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(0,0,0,0.4)] reveal"
+        style="--accent-color:#f97316;">
+        <div class="w-[52px] h-[52px] rounded flex items-center justify-center mb-6 bg-[rgba(249,115,22,0.07)] border border-[rgba(249,115,22,0.2)]" aria-hidden="true">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 6v6l4 2"/><path d="M18 2v4h4"/>
+          </svg>
+        </div>
+        <h3 class="font-display text-[0.8rem] font-bold tracking-[0.08em] text-[#e8edf5] mb-3 uppercase"
+          data-fr="Automatisation &amp; IA" data-en="Automation &amp; AI">Automatisation &amp; IA</h3>
+        <p class="text-[0.85rem] text-[#5a7090] leading-[1.7] mb-6"
+          data-fr="Déploiement de stacks IA auto-hébergées (Ollama, Qdrant, MCP), agents RAG pour la surveillance des logs et gestion des incidents, automatisation n8n et intégrations API (OpenAI, Claude)."
+          data-en="Self-hosted AI stack deployment (Ollama, Qdrant, MCP), RAG agents for log monitoring and incident management, n8n automation and API integrations (OpenAI, Claude).">
+          Déploiement de stacks IA auto-hébergées (Ollama, Qdrant, MCP), agents RAG pour la
+          surveillance des logs et gestion des incidents, automatisation n8n et intégrations API (OpenAI, Claude).
+        </p>
+        <div class="flex flex-wrap gap-[0.4rem]">
+          <span class="font-display text-[0.55rem] font-bold tracking-[0.12em] uppercase px-[0.65rem] py-[0.25rem] rounded-[2px] bg-[rgba(249,115,22,0.07)] border border-[rgba(249,115,22,0.3)] text-[#f97316]">n8n</span>
+          <span class="font-display text-[0.55rem] font-bold tracking-[0.12em] uppercase px-[0.65rem] py-[0.25rem] rounded-[2px] bg-[rgba(249,115,22,0.07)] border border-[rgba(249,115,22,0.3)] text-[#f97316]">LangChain</span>
+          <span class="font-display text-[0.55rem] font-bold tracking-[0.12em] uppercase px-[0.65rem] py-[0.25rem] rounded-[2px] bg-[rgba(249,115,22,0.07)] border border-[rgba(249,115,22,0.3)] text-[#f97316]">Ollama</span>
+          <span class="font-display text-[0.55rem] font-bold tracking-[0.12em] uppercase px-[0.65rem] py-[0.25rem] rounded-[2px] bg-[rgba(249,115,22,0.07)] border border-[rgba(249,115,22,0.3)] text-[#f97316]">Qdrant</span>
+          <span class="font-display text-[0.55rem] font-bold tracking-[0.12em] uppercase px-[0.65rem] py-[0.25rem] rounded-[2px] bg-[rgba(249,115,22,0.07)] border border-[rgba(249,115,22,0.3)] text-[#f97316]">RAG / MCP</span>
+        </div>
+      </article>
+
+      <!-- Service 6: Agile / Project Management -->
+      <article class="service-card relative bg-[#0b1220] border border-[rgba(0,210,255,0.15)] rounded py-[2.2rem] px-[1.8rem] overflow-hidden transition-all duration-300 hover:border-[rgba(0,210,255,0.5)] hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(0,0,0,0.4)] reveal"
+        style="--accent-color:#38bdf8;">
+        <div class="w-[52px] h-[52px] rounded flex items-center justify-center mb-6 bg-[rgba(56,189,248,0.07)] border border-[rgba(56,189,248,0.2)]" aria-hidden="true">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 17.5h7M17.5 14v7"/>
+          </svg>
+        </div>
+        <h3 class="font-display text-[0.8rem] font-bold tracking-[0.08em] text-[#e8edf5] mb-3 uppercase"
+          data-fr="ITSM &amp; Pilotage IT" data-en="ITSM &amp; IT Management">ITSM &amp; Pilotage IT</h3>
+        <p class="text-[0.85rem] text-[#5a7090] leading-[1.7] mb-6"
+          data-fr="Gestion des processus ITSM (incidents, demandes, changements), pilotage Agile (Scrum/Kanban), déploiement ServiceNow, suivi KPI/SLA et conduite du changement (Celonis, Process Mining)."
+          data-en="ITSM process management (incidents, requests, changes), Agile leadership (Scrum/Kanban), ServiceNow deployment, KPI/SLA monitoring and change management (Celonis, Process Mining).">
+          Gestion des processus ITSM (incidents, demandes, changements), pilotage Agile (Scrum/Kanban),
+          déploiement ServiceNow, suivi KPI/SLA et conduite du changement (Celonis, Process Mining).
+        </p>
+        <div class="flex flex-wrap gap-[0.4rem]">
+          <span class="font-display text-[0.55rem] font-bold tracking-[0.12em] uppercase px-[0.65rem] py-[0.25rem] rounded-[2px] bg-[rgba(56,189,248,0.07)] border border-[rgba(56,189,248,0.3)] text-[#38bdf8]">ServiceNow</span>
+          <span class="font-display text-[0.55rem] font-bold tracking-[0.12em] uppercase px-[0.65rem] py-[0.25rem] rounded-[2px] bg-[rgba(56,189,248,0.07)] border border-[rgba(56,189,248,0.3)] text-[#38bdf8]">ITIL</span>
+          <span class="font-display text-[0.55rem] font-bold tracking-[0.12em] uppercase px-[0.65rem] py-[0.25rem] rounded-[2px] bg-[rgba(56,189,248,0.07)] border border-[rgba(56,189,248,0.3)] text-[#38bdf8]">Scrum</span>
+          <span class="font-display text-[0.55rem] font-bold tracking-[0.12em] uppercase px-[0.65rem] py-[0.25rem] rounded-[2px] bg-[rgba(56,189,248,0.07)] border border-[rgba(56,189,248,0.3)] text-[#38bdf8]">Celonis</span>
+          <span class="font-display text-[0.55rem] font-bold tracking-[0.12em] uppercase px-[0.65rem] py-[0.25rem] rounded-[2px] bg-[rgba(56,189,248,0.07)] border border-[rgba(56,189,248,0.3)] text-[#38bdf8]">KPI / SLA</span>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- =============================================
+       CONTACT
+       Security notes:
+       - Form uses mailto: href as fallback (no server-side endpoint exposed here).
+       - No sensitive data (API keys, emails) hardcoded; email is in a data-attribute
+         decoded at runtime to reduce email harvesting by scrapers.
+  ============================================= -->
+  <section id="contact" aria-labelledby="contact-title"
+    class="bg-[#080e1a] border-t border-b border-[rgba(0,210,255,0.15)] py-[clamp(4rem,8vw,7rem)] px-[clamp(1.5rem,6vw,5rem)]">
+    <div class="max-w-[700px] mx-auto">
+
+    <div class="mb-8 reveal text-center">
+      <p class="section-label font-display text-[0.6rem] font-bold tracking-[0.35em] text-[#00d2ff] uppercase flex items-center justify-center gap-3 mb-4"
+        data-fr="Contact" data-en="Contact">Contact</p>
+      <h2 class="font-display text-[clamp(1.6rem,3.5vw,2.6rem)] font-black tracking-[-0.02em] text-[#e8edf5] leading-[1.1]"
+        id="contact-title" data-fr="Me contacter" data-en="Get in touch">Me contacter</h2>
+    </div>
+
+    <div class="reveal bg-[#0b1220] border border-[rgba(0,210,255,0.15)] rounded p-[clamp(1.5rem,3vw,2.5rem)] mt-8">
+      <div class="flex flex-col gap-4">
+        <div class="flex items-center gap-4 text-[0.85rem] text-[#5a7090]">
+          <svg class="shrink-0 text-[#00d2ff]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+          </svg>
+          <span id="contact-email" data-fr="armandh.pro@gmail.com" data-en="armandh.pro@gmail.com">armandh.pro@gmail.com</span>
+        </div>
+        <div class="flex items-center gap-4 text-[0.85rem] text-[#5a7090]">
+          <svg class="shrink-0 text-[#00d2ff]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1 1 16 0z"/><circle cx="12" cy="10" r="3"/>
+          </svg>
+          <span data-fr="Full remote — France &amp; International" data-en="Fully remote — France &amp; Worldwide">Full remote — France &amp; International</span>
+        </div>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <!-- =============================================
+       FOOTER
+  ============================================= -->
+  <footer class="border-t border-[rgba(0,210,255,0.15)] py-8 px-[clamp(1.5rem,6vw,5rem)] flex items-center justify-between text-[0.72rem] text-[#2a3a50]">
+    <div class="font-display font-black text-[0.75rem] tracking-[0.1em]">
+      ARMAND<span class="text-[#00d2ff]">.</span>HURAULT
+    </div>
+    <span>&copy; <span id="footer-year"></span> Armand HURAULT — <span data-fr="Tous droits réservés" data-en="All rights reserved">Tous droits réservés</span></span>
+  </footer>
+
+
+  <!-- =============================================
+       JAVASCRIPT
+  ============================================= -->
+  <script>
+  // 1. MOBILE MENU TOGGLE
+  (function () {
+    const toggle = document.getElementById('navToggle');
+    const menu   = document.getElementById('mobileMenu');
+
+    toggle.addEventListener('click', function () {
+      const isOpen = menu.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+  }());
+
+  function closeMobileMenu() {
+    document.getElementById('mobileMenu').classList.remove('open');
+    document.getElementById('navToggle').setAttribute('aria-expanded', 'false');
+  }
+
+  // 2. SCROLL REVEAL — IntersectionObserver
+  (function () {
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.reveal').forEach(function (el) {
+      observer.observe(el);
+    });
+  }());
+
+  // 3. THREE.JS HERO SCENE
+  (function () {
+    var canvas = document.getElementById('hero-canvas');
+
+    if (typeof THREE === 'undefined') {
+      if (canvas) {
+        canvas.style.background =
+          'radial-gradient(ellipse at 50% 50%, rgba(0,210,255,0.08) 0%, transparent 70%)';
+      }
+      console.warn('Three.js not loaded — 3D scene disabled.');
+      return;
+    }
+
+    var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(canvas.offsetWidth, canvas.offsetHeight);
+
+    var scene  = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(60, canvas.offsetWidth / canvas.offsetHeight, 0.1, 100);
+    camera.position.z = 5;
+
+    var geoIco = new THREE.IcosahedronGeometry(1.6, 1);
+    var matIco = new THREE.MeshBasicMaterial({ color: 0x00d2ff, wireframe: true, transparent: true, opacity: 0.18 });
+    var ico = new THREE.Mesh(geoIco, matIco);
+    scene.add(ico);
+
+    var geoInner = new THREE.IcosahedronGeometry(1.55, 1);
+    var matInner = new THREE.MeshBasicMaterial({ color: 0x00d2ff, wireframe: false, transparent: true, opacity: 0.03 });
+    var inner = new THREE.Mesh(geoInner, matInner);
+    scene.add(inner);
+
+    var geoRing = new THREE.TorusGeometry(2.2, 0.012, 4, 80);
+    var matRing = new THREE.MeshBasicMaterial({ color: 0xff2d78, transparent: true, opacity: 0.35 });
+    var ring = new THREE.Mesh(geoRing, matRing);
+    ring.rotation.x = Math.PI / 2.8;
+    scene.add(ring);
+
+    var ring2 = new THREE.Mesh(
+      new THREE.TorusGeometry(2.7, 0.008, 4, 80),
+      new THREE.MeshBasicMaterial({ color: 0x00d2ff, transparent: true, opacity: 0.18 })
+    );
+    ring2.rotation.x = Math.PI / 1.6;
+    ring2.rotation.z = Math.PI / 4;
+    scene.add(ring2);
+
+    var PARTICLE_COUNT = 220;
+    var positions = new Float32Array(PARTICLE_COUNT * 3);
+    for (var i = 0; i < PARTICLE_COUNT; i++) {
+      positions[i * 3]     = (Math.random() - 0.5) * 14;
+      positions[i * 3 + 1] = (Math.random() - 0.5) * 10;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 8;
+    }
+    var geoPart = new THREE.BufferGeometry();
+    geoPart.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    var matPart = new THREE.PointsMaterial({ color: 0x00d2ff, size: 0.028, transparent: true, opacity: 0.55 });
+    var particles = new THREE.Points(geoPart, matPart);
+    scene.add(particles);
+
+    var mouse = { x: 0, y: 0 };
+    window.addEventListener('mousemove', function (e) {
+      mouse.x = (e.clientX / window.innerWidth  - 0.5) * 2;
+      mouse.y = (e.clientY / window.innerHeight - 0.5) * 2;
+    }, { passive: true });
+
+    var hero = document.getElementById('hero');
+    window.addEventListener('resize', function () {
+      var w = hero.offsetWidth, h = hero.offsetHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+    }, { passive: true });
+
+    var clock = new THREE.Clock();
+    function animate() {
+      requestAnimationFrame(animate);
+      var t = clock.getElapsedTime();
+      ico.rotation.y = t * 0.18; ico.rotation.x = t * 0.09;
+      inner.rotation.y = t * 0.18; inner.rotation.x = t * 0.09;
+      ring.rotation.z  = t * 0.22;
+      ring2.rotation.y = t * 0.15;
+      particles.rotation.y = t * 0.04;
+      particles.rotation.x = t * 0.02;
+      scene.rotation.y += (mouse.x * 0.3  - scene.rotation.y) * 0.04;
+      scene.rotation.x += (-mouse.y * 0.15 - scene.rotation.x) * 0.04;
+      renderer.render(scene, camera);
+    }
+    animate();
+  }());
+
+  // 4. FOOTER YEAR
+  document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+  // 5. LANGUAGE SWITCHER
+  (function () {
+    var ALLOWED_LANGS = ['fr', 'en'];
+    var currentLang   = 'fr';
+
+    try {
+      var stored = localStorage.getItem('armand-lang');
+      if (stored && ALLOWED_LANGS.indexOf(stored) !== -1) { currentLang = stored; }
+    } catch (e) {}
+
+    function applyLang(lang) {
+      if (ALLOWED_LANGS.indexOf(lang) === -1) { return; }
+      currentLang = lang;
+      document.getElementById('page-root').setAttribute('lang', lang);
+      document.getElementById('langLabel').textContent = lang === 'fr' ? 'EN' : 'FR';
+
+      // Security: values come exclusively from data attributes in this file, never user input
+      document.querySelectorAll('[data-fr][data-en]').forEach(function (el) {
+        var text = lang === 'fr' ? el.getAttribute('data-fr') : el.getAttribute('data-en');
+        if (text !== null) { el.innerHTML = text; }
+      });
+
+      document.querySelectorAll('[data-placeholder-fr][data-placeholder-en]').forEach(function (el) {
+        var ph = lang === 'fr' ? el.getAttribute('data-placeholder-fr') : el.getAttribute('data-placeholder-en');
+        if (ph !== null) { el.setAttribute('placeholder', ph); }
+      });
+
+      document.querySelectorAll('option[data-fr][data-en]').forEach(function (opt) {
+        var text = lang === 'fr' ? opt.getAttribute('data-fr') : opt.getAttribute('data-en');
+        if (text !== null) { opt.textContent = text; }
+      });
+
+      try { localStorage.setItem('armand-lang', lang); } catch (e) {}
+    }
+
+    applyLang(currentLang);
+
+    document.getElementById('langToggle').addEventListener('click', function () {
+      applyLang(currentLang === 'fr' ? 'en' : 'fr');
+    });
+  }());
+  </script>
+
+</body>
+</html>
