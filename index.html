@@ -171,6 +171,8 @@
         class="font-display text-[0.65rem] font-bold tracking-[0.15em] text-[#5a7090] uppercase no-underline transition-colors duration-300 hover:text-[#00d2ff]">À propos</a></li>
       <li><a href="#services" data-fr="Services" data-en="Services"
         class="font-display text-[0.65rem] font-bold tracking-[0.15em] text-[#5a7090] uppercase no-underline transition-colors duration-300 hover:text-[#00d2ff]">Services</a></li>
+      <li><a href="#experience" data-fr="Expériences" data-en="Experience"
+        class="font-display text-[0.65rem] font-bold tracking-[0.15em] text-[#5a7090] uppercase no-underline transition-colors duration-300 hover:text-[#00d2ff]">Expériences</a></li>
       <li><a href="#contact" data-fr="Contact" data-en="Contact"
         class="font-display text-[0.65rem] font-bold tracking-[0.15em] text-[#5a7090] uppercase no-underline transition-colors duration-300 hover:text-[#00d2ff]">Contact</a></li>
     </ul>
@@ -196,6 +198,8 @@
       class="font-display text-base font-bold tracking-[0.15em] text-[#5a7090] uppercase no-underline hover:text-[#00d2ff]">À propos</a>
     <a href="#services" onclick="closeMobileMenu()" data-fr="Services" data-en="Services"
       class="font-display text-base font-bold tracking-[0.15em] text-[#5a7090] uppercase no-underline hover:text-[#00d2ff]">Services</a>
+    <a href="#experience" onclick="closeMobileMenu()" data-fr="Expériences" data-en="Experience"
+      class="font-display text-base font-bold tracking-[0.15em] text-[#5a7090] uppercase no-underline hover:text-[#00d2ff]">Expériences</a>
     <a href="#contact" onclick="closeMobileMenu()" data-fr="Contact" data-en="Contact"
       class="font-display text-base font-bold tracking-[0.15em] text-[#5a7090] uppercase no-underline hover:text-[#00d2ff]">Contact</a>
   </div>
@@ -495,6 +499,136 @@
   </section>
 
   <!-- =============================================
+       EXPERIENCE
+  ============================================= -->
+  <section id="experience" aria-labelledby="experience-title"
+    class="bg-[#080e1a] border-t border-b border-[rgba(0,210,255,0.15)] py-[clamp(4rem,8vw,7rem)] px-[clamp(1.5rem,6vw,5rem)]">
+
+    <div class="max-w-[900px] mx-auto">
+
+      <div class="mb-14 reveal">
+        <p class="section-label font-display text-[0.6rem] font-bold tracking-[0.35em] text-[#00d2ff] uppercase flex items-center gap-3 mb-4"
+          data-fr="Expériences" data-en="Experience">Expériences</p>
+        <h2 class="font-display text-[clamp(1.6rem,3.5vw,2.6rem)] font-black tracking-[-0.02em] text-[#e8edf5] leading-[1.1]"
+          id="experience-title" data-fr="Parcours professionnel" data-en="Professional background">Parcours professionnel</h2>
+      </div>
+
+      <div class="flex flex-col gap-5">
+
+        <!-- Corren SA -->
+        <div class="reveal bg-[#0b1220] border border-[rgba(0,210,255,0.15)] rounded-[4px] overflow-hidden" style="border-left: 3px solid #00d2ff;">
+          <div class="py-[1.8rem] px-[1.8rem]">
+            <div class="flex justify-between items-start flex-wrap gap-3 mb-4">
+              <div>
+                <h3 class="font-display text-[0.85rem] font-bold tracking-[0.06em] text-[#e8edf5]"
+                  data-fr="Consultant Ops &amp; Cybersécurité" data-en="Ops &amp; Cybersecurity Consultant">Consultant Ops &amp; Cybersécurité</h3>
+                <p class="text-[0.72rem] text-[#00d2ff] tracking-[0.1em] uppercase mt-1">Corren SA · Genève, Suisse</p>
+              </div>
+              <span class="font-display text-[0.6rem] text-[#2a3a50] tracking-[0.1em] uppercase border border-[rgba(0,210,255,0.15)] px-3 py-1 rounded-[2px]"
+                data-fr="2024 — Présent" data-en="2024 — Present">2024 — Présent</span>
+            </div>
+            <ul class="flex flex-col gap-[0.6rem]">
+              <li class="text-[0.83rem] text-[#5a7090] leading-[1.6] flex gap-3">
+                <span class="text-[#00d2ff] shrink-0 mt-[0.1rem]">▸</span>
+                <span data-fr="Restauration de 6 services critiques (DEV/TEST/PREPROD) via Docker Compose et Portainer ; coordination avec Tech Lead, équipes réseau et 5 Product Owners." data-en="Restored 6 critical services (DEV/TEST/PREPROD) via Docker Compose and Portainer; coordination with Tech Lead, network teams and 5 Product Owners.">Restauration de 6 services critiques (DEV/TEST/PREPROD) via Docker Compose et Portainer ; coordination avec Tech Lead, équipes réseau et 5 Product Owners.</span>
+              </li>
+              <li class="text-[0.83rem] text-[#5a7090] leading-[1.6] flex gap-3">
+                <span class="text-[#00d2ff] shrink-0 mt-[0.1rem]">▸</span>
+                <span data-fr="Déploiement SIEM (ELK, Grafana, Prometheus, SonarQube) et audits OWASP Top 10 (Burp Suite, OWASP ZAP) ; correction de plus de 10 pipelines Jenkins critiques." data-en="SIEM deployment (ELK, Grafana, Prometheus, SonarQube) and OWASP Top 10 audits (Burp Suite, OWASP ZAP); fixed over 10 critical Jenkins pipelines.">Déploiement SIEM (ELK, Grafana, Prometheus, SonarQube) et audits OWASP Top 10 (Burp Suite, OWASP ZAP) ; correction de plus de 10 pipelines Jenkins critiques.</span>
+              </li>
+              <li class="text-[0.83rem] text-[#5a7090] leading-[1.6] flex gap-3">
+                <span class="text-[#00d2ff] shrink-0 mt-[0.1rem]">▸</span>
+                <span data-fr="Stack IA agentique auto-hébergée (Ollama, n8n, Qdrant, MCP) pour la surveillance des logs et la gestion des incidents via agents connectés à Slack." data-en="Self-hosted agentic AI stack (Ollama, n8n, Qdrant, MCP) for log monitoring and incident management via Slack-connected agents.">Stack IA agentique auto-hébergée (Ollama, n8n, Qdrant, MCP) pour la surveillance des logs et la gestion des incidents via agents connectés à Slack.</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Ballpoint Labs -->
+        <div class="reveal bg-[#0b1220] border border-[rgba(0,210,255,0.15)] rounded-[4px] overflow-hidden" style="border-left: 3px solid #00ff8c;">
+          <div class="py-[1.8rem] px-[1.8rem]">
+            <div class="flex justify-between items-start flex-wrap gap-3 mb-4">
+              <div>
+                <h3 class="font-display text-[0.85rem] font-bold tracking-[0.06em] text-[#e8edf5]"
+                  data-fr="Ingénieur DevSecOps" data-en="DevSecOps Engineer">Ingénieur DevSecOps</h3>
+                <p class="text-[0.72rem] text-[#00ff8c] tracking-[0.1em] uppercase mt-1">Ballpoint Labs · Las Vegas, NV, USA</p>
+              </div>
+              <span class="font-display text-[0.6rem] text-[#2a3a50] tracking-[0.1em] uppercase border border-[rgba(0,210,255,0.15)] px-3 py-1 rounded-[2px]">2023 — 2024</span>
+            </div>
+            <ul class="flex flex-col gap-[0.6rem]">
+              <li class="text-[0.83rem] text-[#5a7090] leading-[1.6] flex gap-3">
+                <span class="text-[#00ff8c] shrink-0 mt-[0.1rem]">▸</span>
+                <span data-fr="Orchestration d'un PaaS auto-hébergé via Docker et Coolify (SSL, reverse proxy, load balancing, sauvegardes automatisées)." data-en="Orchestrated a self-hosted PaaS via Docker and Coolify (SSL, reverse proxy, load balancing, automated backups).">Orchestration d'un PaaS auto-hébergé via Docker et Coolify (SSL, reverse proxy, load balancing, sauvegardes automatisées).</span>
+              </li>
+              <li class="text-[0.83rem] text-[#5a7090] leading-[1.6] flex gap-3">
+                <span class="text-[#00ff8c] shrink-0 mt-[0.1rem]">▸</span>
+                <span data-fr="Intégration Wazuh et ELK pour la détection de menaces cyber en temps réel." data-en="Wazuh and ELK integration for real-time cyber threat detection.">Intégration Wazuh et ELK pour la détection de menaces cyber en temps réel.</span>
+              </li>
+              <li class="text-[0.83rem] text-[#5a7090] leading-[1.6] flex gap-3">
+                <span class="text-[#00ff8c] shrink-0 mt-[0.1rem]">▸</span>
+                <span data-fr="Audits et pentest (OpenVAS, Burp Suite) avec scripts d'orchestration pour la remédiation automatique des menaces récurrentes." data-en="Audits and pentesting (OpenVAS, Burp Suite) with orchestration scripts for automated remediation of recurring threats.">Audits et pentest (OpenVAS, Burp Suite) avec scripts d'orchestration pour la remédiation automatique des menaces récurrentes.</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Allianz France -->
+        <div class="reveal bg-[#0b1220] border border-[rgba(0,210,255,0.15)] rounded-[4px] overflow-hidden" style="border-left: 3px solid #ff2d78;">
+          <div class="py-[1.8rem] px-[1.8rem]">
+            <div class="flex justify-between items-start flex-wrap gap-3 mb-4">
+              <div>
+                <h3 class="font-display text-[0.85rem] font-bold tracking-[0.06em] text-[#e8edf5]"
+                  data-fr="Chef de Projet ITSM — Ingénieur Cybersécurité" data-en="ITSM Project Manager — Cybersecurity Engineer">Chef de Projet ITSM — Ingénieur Cybersécurité</h3>
+                <p class="text-[0.72rem] text-[#ff2d78] tracking-[0.1em] uppercase mt-1">Allianz France · Paris, France</p>
+              </div>
+              <span class="font-display text-[0.6rem] text-[#2a3a50] tracking-[0.1em] uppercase border border-[rgba(0,210,255,0.15)] px-3 py-1 rounded-[2px]">2020 — 2023</span>
+            </div>
+            <ul class="flex flex-col gap-[0.6rem]">
+              <li class="text-[0.83rem] text-[#5a7090] leading-[1.6] flex gap-3">
+                <span class="text-[#ff2d78] shrink-0 mt-[0.1rem]">▸</span>
+                <span data-fr="Pilotage d'une équipe de 4 personnes pour le déploiement de Celonis sur ServiceNow ; coordination internationale (Inde, Allemagne) en méthodologie Agile." data-en="Led a 4-person team to deploy Celonis on ServiceNow; international coordination (India, Germany) using Agile methodology.">Pilotage d'une équipe de 4 personnes pour le déploiement de Celonis sur ServiceNow ; coordination internationale (Inde, Allemagne) en méthodologie Agile.</span>
+              </li>
+              <li class="text-[0.83rem] text-[#5a7090] leading-[1.6] flex gap-3">
+                <span class="text-[#ff2d78] shrink-0 mt-[0.1rem]">▸</span>
+                <span data-fr="Campagnes de sensibilisation (phishing, OSINT) ayant contribué à une réduction de 12 % des incidents." data-en="Awareness campaigns (phishing, OSINT) contributing to a 12% reduction in incidents.">Campagnes de sensibilisation (phishing, OSINT) ayant contribué à une réduction de 12 % des incidents.</span>
+              </li>
+              <li class="text-[0.83rem] text-[#5a7090] leading-[1.6] flex gap-3">
+                <span class="text-[#ff2d78] shrink-0 mt-[0.1rem]">▸</span>
+                <span data-fr="Gouvernance ITSM (ITIL) : 116 services déployés sur ServiceNow, suivi KPI/SLA, génération de +23 % de productivité." data-en="ITSM governance (ITIL): 116 services deployed on ServiceNow, KPI/SLA monitoring, generating +23% productivity.">Gouvernance ITSM (ITIL) : 116 services déployés sur ServiceNow, suivi KPI/SLA, génération de +23 % de productivité.</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Netcome Voyages -->
+        <div class="reveal bg-[#0b1220] border border-[rgba(0,210,255,0.15)] rounded-[4px] overflow-hidden" style="border-left: 3px solid #f97316;">
+          <div class="py-[1.8rem] px-[1.8rem]">
+            <div class="flex justify-between items-start flex-wrap gap-3 mb-4">
+              <div>
+                <h3 class="font-display text-[0.85rem] font-bold tracking-[0.06em] text-[#e8edf5]"
+                  data-fr="Ingénieur Cloud DevOps &amp; Automatisation" data-en="Cloud DevOps &amp; Automation Engineer">Ingénieur Cloud DevOps &amp; Automatisation</h3>
+                <p class="text-[0.72rem] text-[#f97316] tracking-[0.1em] uppercase mt-1">Netcome Voyages · Paris, France</p>
+              </div>
+              <span class="font-display text-[0.6rem] text-[#2a3a50] tracking-[0.1em] uppercase border border-[rgba(0,210,255,0.15)] px-3 py-1 rounded-[2px]">2019 — 2020</span>
+            </div>
+            <ul class="flex flex-col gap-[0.6rem]">
+              <li class="text-[0.83rem] text-[#5a7090] leading-[1.6] flex gap-3">
+                <span class="text-[#f97316] shrink-0 mt-[0.1rem]">▸</span>
+                <span data-fr="Automatisation back-office et data scraping (Bash, Python, Selenium, UiPath)." data-en="Back-office automation and data scraping (Bash, Python, Selenium, UiPath).">Automatisation back-office et data scraping (Bash, Python, Selenium, UiPath).</span>
+              </li>
+              <li class="text-[0.83rem] text-[#5a7090] leading-[1.6] flex gap-3">
+                <span class="text-[#f97316] shrink-0 mt-[0.1rem]">▸</span>
+                <span data-fr="Infrastructure as Code AWS : conception et gestion via Terraform, Ansible, Packer ; gestion des accès IAM." data-en="AWS Infrastructure as Code: design and management via Terraform, Ansible, Packer; IAM access management.">Infrastructure as Code AWS : conception et gestion via Terraform, Ansible, Packer ; gestion des accès IAM.</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================================
        CONTACT
        Security notes:
        - Form uses mailto: href as fallback (no server-side endpoint exposed here).
@@ -502,7 +636,7 @@
          decoded at runtime to reduce email harvesting by scrapers.
   ============================================= -->
   <section id="contact" aria-labelledby="contact-title"
-    class="bg-[#080e1a] border-t border-b border-[rgba(0,210,255,0.15)] py-[clamp(4rem,8vw,7rem)] px-[clamp(1.5rem,6vw,5rem)]">
+    class="py-[clamp(4rem,8vw,7rem)] px-[clamp(1.5rem,6vw,5rem)]">
     <div class="max-w-[700px] mx-auto">
 
     <div class="mb-8 reveal text-center">
