@@ -148,8 +148,6 @@
     .mobile-menu.open { display: flex; }
 
     @media (max-width: 900px) {
-      .nav-links  { display: none; }
-      .nav-toggle { display: flex !important; }
       .about-stats { flex-wrap: wrap; gap: 1.2rem; }
       footer { flex-direction: column; gap: 0.5rem; text-align: center; }
     }
@@ -167,7 +165,7 @@
       ARMAND<span class="text-[#00d2ff]">.</span>HURAULT
     </div>
 
-    <ul class="nav-links flex gap-8 list-none">
+    <ul class="nav-links max-[900px]:hidden flex gap-8 list-none">
       <li><a href="#about" data-fr="À propos" data-en="About"
         class="font-display text-[0.65rem] font-bold tracking-[0.15em] text-[#5a7090] uppercase no-underline transition-colors duration-300 hover:text-[#00d2ff]">À propos</a></li>
       <li><a href="#services" data-fr="Services" data-en="Services"
@@ -184,7 +182,7 @@
       <span id="langLabel">EN</span>
     </button>
 
-    <button class="nav-toggle hidden flex-col gap-[5px] bg-transparent border-none cursor-pointer p-1"
+    <button class="nav-toggle max-[900px]:flex hidden flex-col gap-[5px] bg-transparent border-none cursor-pointer p-1"
       aria-label="Ouvrir le menu" aria-expanded="false" id="navToggle">
       <span class="block w-[22px] h-[2px] bg-[#e8edf5] transition-all duration-300"></span>
       <span class="block w-[22px] h-[2px] bg-[#e8edf5] transition-all duration-300"></span>
